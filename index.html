@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue.js Todoアプリ</title>
+  <link rel="stylesheet" href="main.css">
+  <link rel ="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+  <div id="app" class="container" v-cloak>
+    <div class="wrapper">
+      <p class="title">{{ title }}</p>
+      <section class="add-task">
+        <input type="text" v-model="newTask">
+        <button @click="addTask">追加する</button>
+      </section>
+      <section class="tasks">
+        <ul>
+          <template v-for="(task, index) in tasks">
+            <li
+              :class="{ complete: task.isComplete }"
+              @click="completeTask(index)"
+            >
+              {{ task.name }}
+              <button
+                @click="deleteTask(index)"
+                class="trash-icon"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </li>
+          </template>
+        </ul>
+      </section>
+    </div>
+  </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+</html>
+
+<script>
+  new Vue({
+    el: "#app",
+    data: {
+      title: "My Todo App",
+      tasks: [],
+      newTask: ""
+    },
+    mounted() {
+      this.getLocalStorageData()
+    },
+    methods: {
+      addTask() {
+        const task = {
+          name: this.newTask,
+          isComplete: false
+        }
+
+        this.tasks.push(task)
+        localStorage.setItem('todo', JSON.stringify(this.tasks));
+        this.newTask = ""
+      },
+      deleteTask(index) {
+        this.tasks.forEach((task, loopIndex) => {
+          if (index === loopIndex) {
+            this.tasks.splice(index, 1);
+          }
+        })
+        localStorage.setItem('todo', JSON.stringify(this.tasks));
+      },
+      completeTask(index) {
+        this.tasks.forEach((task, loopIndex) => {
+          if (index === loopIndex) {
+            task.isComplete = !task.isComplete
+          }
+        })
+        localStorage.setItem('todo', JSON.stringify(this.tasks));
+      },
+      getLocalStorageData() {
+        const todo = localStorage.getItem('todo')
+
+        if (todo) {
+          this.tasks = JSON.parse(todo)
+        }
+      }
+    }
+  })
+</script>
